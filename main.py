@@ -69,7 +69,7 @@ def gen_rand_anek(message):
         bot.send_message(message.chat.id, 'Вот тебе анекдот из моей базы данных.')
         path = 'images/' + str(rand) + '.png'
         bot.send_photo(message.chat.id, open(path, 'rb'), caption=anek[0][0])
-    finally:
+    except:
         bot.send_message(message.chat.id, 'Произошла ошибка.')
 
 
@@ -82,7 +82,7 @@ def anek_by_id(message):
         bot.send_message(message.chat.id, 'Вот анекдот с указанным id:')
         path = 'images/' + message.text + '.png'
         bot.send_photo(message.chat.id, open(path, 'rb'), caption=anek[0][0])
-    finally:
+    except:
         bot.send_message(message.chat.id, 'Такого анекдота нет. Попробуй другой id.')
         logging.error('Not found (anek_by_id)')
 
@@ -94,7 +94,7 @@ def anek_by_id(message):
 #        c.execute("INSERT INTO suggestions(user_id,username,suggestion) VALUES(" + str(message.chat.id) + "," +
 #                  str(message.from_user.username) + "," + str(message.text)[8:] + ")")
 #        conn.commit()
-#    finally:
+#    except:
 #        bot.send_message(message.chat.id, 'Ошибка.')
 #        logging.error('DB Error')
 
