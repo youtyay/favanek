@@ -48,7 +48,9 @@ def start(message):
 
 /sub - подписаться на рассылку 
 
-/unsub - отписаться от рассылки</i>
+/unsub - отписаться от рассылки
+
+/suggest [текст] - предложить ваш анекдот :)</i>
 
 ❗<b>ВНИМАНИЕ! Некоторые анекдоты могут содержать нецензурную лексику, чёрный юмор, неприемлемые темы. 
 Мы не несём ответственность, если анекдот как-то задел вас и/или группу людей.</b>
@@ -67,7 +69,7 @@ def gen_rand_anek(message):
         bot.send_message(message.chat.id, 'Вот тебе анекдот из моей базы данных.')
         path = 'images/' + str(rand) + '.png'
         bot.send_photo(message.chat.id, open(path, 'rb'), caption=anek[0][0])
-    except:
+    finally:
         bot.send_message(message.chat.id, 'Произошла ошибка.')
 
 
@@ -80,9 +82,21 @@ def anek_by_id(message):
         bot.send_message(message.chat.id, 'Вот анекдот с указанным id:')
         path = 'images/' + message.text + '.png'
         bot.send_photo(message.chat.id, open(path, 'rb'), caption=anek[0][0])
-    except:
+    finally:
         bot.send_message(message.chat.id, 'Такого анекдота нет. Попробуй другой id.')
         logging.error('Not found (anek_by_id)')
+
+
+#@bot.message_handler(content_types=['suggest'])
+#def suggest(message):
+#    logging.info(str(message.chat.id) + " " + "@" + str(message.from_user.username) + " " + str(message.text))
+#    try:
+#        c.execute("INSERT INTO suggestions(user_id,username,suggestion) VALUES(" + str(message.chat.id) + "," +
+#                  str(message.from_user.username) + "," + str(message.text)[8:] + ")")
+#        conn.commit()
+#    finally:
+#        bot.send_message(message.chat.id, 'Ошибка.')
+#        logging.error('DB Error')
 
 
 bot.polling()
