@@ -86,3 +86,6 @@ def anek_by_id(message):
 
 
 bot.polling()
+
+if __name__ == '__main__':
+    logging.info("Bot STOPPED")
