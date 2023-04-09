@@ -59,7 +59,7 @@ def start(message):
 def gen_rand_anek(message):
     log(message)
     try:
-        rand = random.randrange(10)
+        rand = random.randrange(1, 10)
         anek = c.execute('SELECT text FROM anek WHERE id=' + str(rand)).fetchall()
         bot.send_message(message.chat.id, 'Вот тебе анекдот из моей базы данных.')
         bot.send_photo(message.chat.id, open('images/' + str(rand) + '.png', 'rb'),
