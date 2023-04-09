@@ -64,11 +64,12 @@ def start(message):
 def gen_rand_anek(message):
     logging.info(str(message.chat.id) + " " + "@" + str(message.from_user.username) + " " + str(message.text))
     try:
-        rand = random.randint(1, 5)
+        rand = random.randint(1, 10)
         anek = c.execute('SELECT text FROM anek WHERE id=' + str(rand)).fetchall()
         bot.send_message(message.chat.id, 'Вот тебе анекдот из моей базы данных.')
         path = 'images/' + str(rand) + '.png'
-        bot.send_photo(message.chat.id, open(path, 'rb'), caption=anek[0][0])
+        bot.send_photo(message.chat.id, open(path, 'rb'), caption=("<b>#" + str(rand) + "\n \n</b>" +
+                                                                   "<i>" + anek[0][0] + "</i>"), parse_mode='HTML')
     except:
         bot.send_message(message.chat.id, 'Произошла ошибка.')
 
@@ -81,13 +82,14 @@ def anek_by_id(message):
         anek = c.execute('SELECT text FROM anek WHERE id=' + str(anek_id)).fetchall()
         bot.send_message(message.chat.id, 'Вот анекдот с указанным id:')
         path = 'images/' + message.text + '.png'
-        bot.send_photo(message.chat.id, open(path, 'rb'), caption=anek[0][0])
+        bot.send_photo(message.chat.id, open(path, 'rb'), caption=("<b>#" + message.text + "\n \n</b>" +
+                                                                   "<i>" + anek[0][0] + "</i>"), parse_mode='HTML')
     except:
         bot.send_message(message.chat.id, 'Такого анекдота нет. Попробуй другой id.')
         logging.error('Not found (anek_by_id)')
 
 
-#@bot.message_handler(content_types=['suggest'])
+#@bot.message_handler(commands=['suggest'])
 #def suggest(message):
 #    logging.info(str(message.chat.id) + " " + "@" + str(message.from_user.username) + " " + str(message.text))
 #    try:
