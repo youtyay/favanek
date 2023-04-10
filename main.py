@@ -3,11 +3,15 @@ from telebot import types
 import telebot
 import random
 import logging
+import datetime
+
+date_obj = datetime.datetime.now()
+date = date_obj.strftime('%m-%d-%y-%H-%M-%S')
 
 #logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(message)s')
 logging.basicConfig(
     level=logging.DEBUG,
-    filename='log.log',
+    filename=('logs/' + date + '.log'),
     format='%(asctime)s %(levelname)s %(name)s %(message)s'
 )
 
