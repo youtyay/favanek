@@ -69,6 +69,27 @@ def gen_rand_anek(message):
         bot.send_message(message.chat.id, 'Произошла ошибка.')
 
 
+@bot.message_handler(commands=['suggest'])
+def suggest_message(message):
+    bot.send_message(message.chat.id, 'Пожалуйста, введите Ваш анекдот. Если передумали - /cancel в помощь')
+    bot.register_next_step_handler(message, save_suggestion)
+
+
+def save_suggestion(message):
+    user_id = str(message.from_user.id)
+    username = str(message.from_user.username)
+    suggestion = str(message.text)
+    if message.text != "/cancel":
+        try:
+            c.execute("INSERT INTO suggestions VALUES (NULL, ?,?,?)", (user_id, username, suggestion))
+            conn.commit()
+            bot.send_message(message.chat.id, 'Спасибо за Ваш анекдот, мы оценим его!')
+        except:
+            bot.send_message(message.chat.id, 'Попробуйте позже, ошибка!')
+    else:
+        bot.send_message(message.chat.id, 'Возвращайтесь, как передумаете ;)')
+
+
 @bot.message_handler(content_types=['text'])
 def anek_by_id(message):
     log(message)
@@ -80,18 +101,6 @@ def anek_by_id(message):
     except Exception as e:
         bot.send_message(message.chat.id, 'Такого анекдота нет. Попробуй другой id.')
         logging.info("Ошибка > " + str(e))
-
-
-# @bot.message_handler(commands=['suggest'])
-# def suggest(message):
-#    logging.info(str(message.chat.id) + " " + "@" + str(message.from_user.username) + " " + str(message.text))
-#    try:
-#        c.execute("INSERT INTO suggestions(user_id,username,suggestion) VALUES(" + str(message.chat.id) + "," +
-#                  str(message.from_user.username) + "," + str(message.text)[8:] + ")")
-#        conn.commit()
-#    except:
-#        bot.send_message(message.chat.id, 'Ошибка.')
-#        logging.error('DB Error')
 
 
 bot.infinity_polling()
