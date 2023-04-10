@@ -74,7 +74,7 @@ def gen_rand_anek(message):
         bot.send_photo(message.chat.id, open('images/' + str(rand) + '.png', 'rb'),
                        caption=("<b>#" + str(rand) + "\n \n</b>" + "<i>" + anek[0][0] + "</i>"), parse_mode='HTML')
     except Exception as e:
-        logging.info("Ошибка > " + str(e))
+        logging.error("Ошибка > " + str(e))
         bot.send_message(message.chat.id, 'Произошла ошибка.')
 
 
@@ -93,7 +93,8 @@ def save_suggestion(message):
             c.execute("INSERT INTO suggestions VALUES (NULL, ?,?,?)", (user_id, username, suggestion))
             conn.commit()
             bot.send_message(message.chat.id, 'Спасибо за Ваш анекдот, мы оценим его!')
-        except:
+        except Exception as e:
+            logging.error("Ошибка > " + str(e))
             bot.send_message(message.chat.id, 'Попробуйте позже, ошибка!')
     else:
         bot.send_message(message.chat.id, 'Возвращайтесь, как передумаете ;)')
@@ -108,7 +109,7 @@ def anek_by_id(message):
                        caption=("<b>#" + message.text + "\n \n</b>" + "<i>" + anek[0][0] + "</i>"), parse_mode='HTML')
     except Exception as e:
         bot.send_message(message.chat.id, 'Неверная команда или ID анекдота.')
-        logging.info("Ошибка > " + str(e))
+        logging.error("Ошибка > " + str(e))
 
 
 bot.infinity_polling()
