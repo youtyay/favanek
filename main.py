@@ -99,11 +99,10 @@ def anek_by_id(message):
     log(message)
     try:
         anek = c.execute('SELECT text FROM anek WHERE id=' + str(message.text)).fetchall()
-        bot.send_message(message.chat.id, 'Вот анекдот с указанным id:')
         bot.send_photo(message.chat.id, open('images/' + message.text + '.png', 'rb'),
                        caption=("<b>#" + message.text + "\n \n</b>" + "<i>" + anek[0][0] + "</i>"), parse_mode='HTML')
     except Exception as e:
-        bot.send_message(message.chat.id, 'Такого анекдота нет. Попробуй другой id.')
+        bot.send_message(message.chat.id, 'Неверная команда или ID анекдота.')
         logging.info("Ошибка > " + str(e))
 
 
