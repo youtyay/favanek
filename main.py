@@ -61,7 +61,7 @@ def start(message):
 /unfav [номер анекдота] - аналогично предыдущей, но удаляет анекдот из избранного
 /sub - подписаться на рассылку 
 /unsub - отписаться от рассылки
-/suggest [текст] - предложить ваш анекдот :)</i>''', parse_mode='HTML')
+/suggest - предложить ваш анекдот :)</i>''', parse_mode='HTML')
 
 
 @bot.message_handler(commands=['rand'])
