@@ -1,0 +1,10 @@
+2023-04-13 17:09:13,773 INFO root Token successfully initted: 6234331500:AAG2Hcuep4y4N58uuJeXrHnjbpaSyrpXk3c
+2023-04-13 17:09:13,774 INFO root Bot successfully initted
+2023-04-13 17:09:13,783 INFO root DB connected successfully, cursor created
+2023-04-13 17:09:13,798 DEBUG urllib3.connectionpool Starting new HTTPS connection (1): api.telegram.org:443
+2023-04-13 17:09:14,258 DEBUG urllib3.connectionpool https://api.telegram.org:443 "GET /bot6234331500:AAG2Hcuep4y4N58uuJeXrHnjbpaSyrpXk3c/getMe HTTP/1.1" 200 191
+2023-04-13 17:09:14,267 DEBUG urllib3.connectionpool Starting new HTTPS connection (1): api.telegram.org:443
+2023-04-13 17:09:18,244 DEBUG urllib3.connectionpool https://api.telegram.org:443 "GET /bot6234331500:AAG2Hcuep4y4N58uuJeXrHnjbpaSyrpXk3c/getUpdates?offset=1&timeout=20 HTTP/1.1" 409 143
+2023-04-13 17:09:18,261 ERROR TeleBot Infinity polling: polling exited
+2023-04-13 17:09:18,261 ERROR TeleBot Break infinity polling
+2023-04-13 17:09:18,261 INFO root Bot STOPPED

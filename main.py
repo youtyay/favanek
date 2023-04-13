@@ -80,7 +80,11 @@ def gen_rand_anek(message):
 
 @bot.message_handler(commands=['suggest'])
 def suggest_message(message):
-    bot.send_message(message.chat.id, 'Пожалуйста, введите Ваш анекдот. Если передумали - /cancel в помощь')
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn1 = types.KeyboardButton("Отмена")
+    markup.add(btn1)
+    bot.send_message(message.chat.id, 'Пожалуйста, введите Ваш анекдот. Если передумали - кнопка отмены в помощь',
+                     reply_markup=markup)
     bot.register_next_step_handler(message, save_suggestion)
 
 
@@ -88,7 +92,7 @@ def save_suggestion(message):
     user_id = str(message.from_user.id)
     username = str(message.from_user.username)
     suggestion = str(message.text)
-    if message.text != "/cancel":
+    if message.text != "Отмена":
         try:
             c.execute("INSERT INTO suggestions VALUES (NULL, ?,?,?)", (user_id, username, suggestion))
             conn.commit()
