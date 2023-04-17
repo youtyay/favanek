@@ -110,6 +110,7 @@ def save_suggestion(message):
 #     try:
 #         user_id = str(message.from_user.id)
 #         if len(message.text) == 4:
+#             favos = c.execute('SELECT favs FROM user_fav WHERE id=' + user_id).fetchall()
 #
 #     except Exception as e:
 #         bot.send_message(message.chat.id, 'Произошла ошибка.')
