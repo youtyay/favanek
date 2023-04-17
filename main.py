@@ -23,9 +23,7 @@ conn = sqlite3.connect('anek.db', check_same_thread=False)
 c = conn.cursor()
 logging.info("DB connected successfully, cursor created")
 
-
-def log(message): logging.info(str(message.chat.id) + " " + "@" + str(
-    message.from_user.username if message.from_user.username else "None") + " " + str(message.text))
+def log(message): logging.info(str(message.chat.id) + " " + "@" + str(message.from_user.username if message.from_user.username else "None") + " " + str(message.text))
 
 
 @bot.message_handler(commands=['start'])
@@ -105,16 +103,23 @@ def save_suggestion(message):
         bot.send_message(message.chat.id, 'Возвращайтесь, как передумаете ;)')
 
 
-# @bot.message_handler(commands=['fav'])
-# def fav(message):
-#     try:
-#         user_id = str(message.from_user.id)
-#         if len(message.text) <= 5:
-#             favos = c.execute('SELECT favs FROM user_fav WHERE id=' + user_id).fetchall()
-#             favos = favos[0][0].split()
-#     except Exception as e:
-#         bot.send_message(message.chat.id, 'Произошла ошибка.')
-#         logging.error("Ошибка > " + str(e))
+@bot.message_handler(commands=['sub'])
+def subscribe(message):
+    try:
+        user_id = str(message.from_user.id)
+        with open('subs.txt', 'r') as sublist:
+            sublist = sublist.read()
+            sublist = sublist.split('\n')
+        if user_id in sublist:
+            bot.send_message(message.chat.id, 'Вы уже подписаны на рассылку анекдотов :)')
+        else:
+            with open('subs.txt', 'r+') as sublist:
+                sublisttext = sublist.read()
+                sublist.write(sublisttext + user_id + "\n")
+            bot.send_message(message.chat.id, 'Вы подписались на рассылку анекдотов :)')
+    except Exception as e:
+        bot.send_message(message.chat.id, 'Произошла ошибка.')
+        logging.error("Ошибка > " + str(e))
 
 
 @bot.message_handler(content_types=['text'])
