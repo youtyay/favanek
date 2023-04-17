@@ -57,6 +57,7 @@ def start(message):
 [номер анекдота] - выслать анекдот под этим номером
 /start - это сообщение
 /rand - случайный анекдот
+/fav - список избранных анекдотов
 /fav [номер анекдота] - добавить конкретный анекдот в избранное
 /unfav [номер анекдота] - аналогично предыдущей, но удаляет анекдот из избранного
 /sub - подписаться на рассылку 
@@ -102,6 +103,17 @@ def save_suggestion(message):
             bot.send_message(message.chat.id, 'Попробуйте позже, ошибка!')
     else:
         bot.send_message(message.chat.id, 'Возвращайтесь, как передумаете ;)')
+
+
+# @bot.message_handler(commands=['fav'])
+# def fav(message):
+#     try:
+#         user_id = str(message.from_user.id)
+#         if len(message.text) == 4:
+#
+#     except Exception as e:
+#         bot.send_message(message.chat.id, 'Произошла ошибка.')
+#         logging.error("Ошибка > " + str(e))
 
 
 @bot.message_handler(content_types=['text'])
