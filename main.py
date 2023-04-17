@@ -115,8 +115,33 @@ def subscribe(message):
         else:
             with open('subs.txt', 'r+') as sublist:
                 sublisttext = sublist.read()
-                sublist.write(sublisttext + user_id + "\n")
+                sublist.write(user_id + "\n")
             bot.send_message(message.chat.id, 'Вы подписались на рассылку анекдотов :)')
+    except Exception as e:
+        bot.send_message(message.chat.id, 'Произошла ошибка.')
+        logging.error("Ошибка > " + str(e))
+
+
+@bot.message_handler(commands=['unsub'])
+def unsubscribe(message):
+    try:
+        user_id = str(message.from_user.id)
+        with open('subs.txt', 'r') as sublist:
+            sublist = sublist.read()
+            sublist = sublist.split('\n')
+        if user_id not in sublist:
+            bot.send_message(message.chat.id, 'Вы ещё не подписаны на рассылку анекдотов :)')
+        else:
+            with open('subs.txt', 'r') as sublist:
+                sublisttext = sublist.read()
+                sublistlist = sublisttext.split('\n')
+                sublistlist.remove(user_id)
+                tempstr = ""
+            with open('subs.txt', 'w') as sublist:
+                for i in sublistlist:
+                    tempstr = tempstr + i + "\n"
+                sublist.write(tempstr)
+            bot.send_message(message.chat.id, 'Вы отписались от рассылки анекдотов :(')
     except Exception as e:
         bot.send_message(message.chat.id, 'Произошла ошибка.')
         logging.error("Ошибка > " + str(e))
