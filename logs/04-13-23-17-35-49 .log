@@ -1,6 +1,0 @@
-2023-04-13 17:35:49,235 INFO root Token successfully initted: 6234331500:AAG2Hcuep4y4N58uuJeXrHnjbpaSyrpXk3c
-2023-04-13 17:35:49,236 INFO root Bot successfully initted
-2023-04-13 17:35:49,237 INFO root DB connected successfully, cursor created
-2023-04-13 17:35:49,241 DEBUG urllib3.connectionpool Starting new HTTPS connection (1): api.telegram.org:443
-2023-04-13 17:35:49,541 DEBUG urllib3.connectionpool https://api.telegram.org:443 "GET /bot6234331500:AAG2Hcuep4y4N58uuJeXrHnjbpaSyrpXk3c/getMe HTTP/1.1" 200 191
-2023-04-13 17:35:49,545 DEBUG urllib3.connectionpool Starting new HTTPS connection (1): api.telegram.org:443
