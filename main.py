@@ -175,7 +175,7 @@ def sendm(message):
                 sublist = sublist.split('\n')
             try:
                 for i in sublist:
-                    bot.send_message(i, message.text[5:])
+                    bot.send_message(i, message.text[5:], parse_mode='Markdown')
             except Exception:
                 pass
         else:
@@ -185,20 +185,16 @@ def sendm(message):
         logging.error("Ошибка > " + str(e))
 
 
-@bot.message_handler(commands=['botstop'])
-def botstop(message):
-    try:
-        user_id = str(message.from_user.id)
-        with open("admins.txt", "r") as adminl:
-            adminl = adminl.read()
-            adminl = adminl.split("\n")
-        if user_id in adminl:
-            sys.exit()
-        else:
-            bot.send_message(message.chat.id, 'У вас недостаточно прав для выполнения этой команды :)')
-    except Exception as e:
-        bot.send_message(message.chat.id, 'Что-то пошло не так.')
-        logging.error("Ошибка > " + str(e))
+# @bot.message_handler(commands=['botstop'])
+# def botstop(message):
+#     user_id = str(message.from_user.id)
+#     with open("admins.txt", "r") as adminl:
+#         adminl = adminl.read()
+#         adminl = adminl.split("\n")
+#     if user_id in adminl:
+#         sys.exit()
+#     else:
+#         bot.send_message(message.chat.id, 'У вас недостаточно прав для выполнения этой команды :)')
 
 
 @bot.message_handler(content_types=['text'])
