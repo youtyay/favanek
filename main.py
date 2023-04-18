@@ -116,7 +116,7 @@ def save_suggestion(message):
             logging.error("Ошибка > " + str(e))
             bot.send_message(message.chat.id, 'Попробуйте позже, ошибка!')
     else:
-        bot.send_message(message.chat.id, 'Возвращайтесь, как передумаете ;)')
+        bot.send_message(message.chat.id, 'Возвращайтесь, как передумаете ;)', reply_markup=types.ReplyKeyboardRemove())
 
 
 @bot.message_handler(commands=['sub'])
