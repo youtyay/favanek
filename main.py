@@ -161,6 +161,14 @@ def unsubscribe(message):
         logging.error("Ошибка > " + str(e))
 
 
+@bot.message_handler(commands=['send'])
+def sendm(message):
+    try:
+        pass
+    except:
+        pass
+
+
 @bot.message_handler(content_types=['text'])
 def anek_by_id(message):
     log(message)
