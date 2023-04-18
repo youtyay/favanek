@@ -4,6 +4,7 @@ import telebot
 import random
 import logging
 import datetime
+import sys
 
 date_obj = datetime.datetime.now()
 date = date_obj.strftime('%m-%d-%y-%H-%M-%S ')
@@ -177,6 +178,22 @@ def unsubscribe(message):
                      bot.send_message(i, message.text[5:]) 
              except: 
                  pass
+         else:
+             bot.send_message(message.chat.id, 'У вас недостаточно прав для выполнения этой команды :)')
+     except Exception as e: 
+         bot.send_message(message.chat.id, 'Что-то пошло не так.')
+        logging.error("Ошибка > " + str(e))
+
+
+@bot.message_handler(commands=['botstop']) 
+ def botstop(message): 
+     try:
+         user_id = str(message.from_user.id)
+         with open("admins.txt", "r") as adminl:
+             adminl = adminl.read()
+             adminl = adminl.split("\n")
+         if user_id in adminl:
+             sys.exit()
          else:
              bot.send_message(message.chat.id, 'У вас недостаточно прав для выполнения этой команды :)')
      except Exception as e: 
