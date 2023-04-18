@@ -124,13 +124,13 @@ def subscribe(message):
     try:
         user_id = str(message.from_user.id)
         with open('subs.txt', 'r') as sublist:
-            sublist = sublist.read()
-            sublist = sublist.split('\n')
-        if user_id in sublist:
+            sublistl = sublist.read()
+            sublistl1 = sublistl.split('\n')
+        if user_id in sublistl1:
             bot.send_message(message.chat.id, 'Вы уже подписаны на рассылку анекдотов :)')
         else:
             with open('subs.txt', 'r+') as sublist:
-                sublist.write(user_id + "\n")
+                sublist.write(sublistl + user_id + "\n")
             bot.send_message(message.chat.id, 'Вы подписались на рассылку анекдотов :)')
     except Exception as e:
         bot.send_message(message.chat.id, 'Произошла ошибка.')
@@ -185,16 +185,18 @@ def sendm(message):
         logging.error("Ошибка > " + str(e))
 
 
-# @bot.message_handler(commands=['botstop'])
-# def botstop(message):
-#     user_id = str(message.from_user.id)
-#     with open("admins.txt", "r") as adminl:
-#         adminl = adminl.read()
-#         adminl = adminl.split("\n")
-#     if user_id in adminl:
-#         sys.exit()
-#     else:
-#         bot.send_message(message.chat.id, 'У вас недостаточно прав для выполнения этой команды :)')
+@bot.message_handler(commands=['botstop'])
+def botstop(message):
+    try:
+        user_id = str(message.from_user.id)
+        with open("admins.txt", "r") as adminl:
+            adminl = adminl.read()
+            adminl = adminl.split("\n")
+    finally:
+        if user_id in adminl:
+            raise Exception("Stopped by Admin.")
+        else:
+            bot.send_message(message.chat.id, 'У вас недостаточно прав для выполнения этой команды :)')
 
 
 @bot.message_handler(content_types=['text'])
