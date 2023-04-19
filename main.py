@@ -175,7 +175,7 @@ def sendm(message):
                 sublist = sublist.split('\n')
             try:
                 for i in sublist:
-                    if i != '\n' and '':
+                    if i != ('\n' or ''):
                         bot.send_message(i, message.text[5:], parse_mode='Markdown')
             except Exception:
                 pass
