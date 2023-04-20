@@ -4,6 +4,8 @@ import telebot
 import random
 import logging
 import datetime
+import threading
+lock = threading.Lock()
 
 date_obj = datetime.datetime.now()
 date = date_obj.strftime('%m-%d-%y-%H-%M-%S ')
@@ -70,8 +72,8 @@ def gen_rand_anek(message):
     try:
 
         rand = random.randrange(1, 10)
-
-        fav_list = c.execute('SELECT favs FROM user_fav WHERE id = ?', (message.from_user.id,)).fetchall()
+        with lock:
+            fav_list = c.execute('SELECT favs FROM user_fav WHERE id = ?', (message.from_user.id,)).fetchall()
 
         if fav_list:
 
@@ -91,8 +93,8 @@ def gen_rand_anek(message):
 
         markup = types.InlineKeyboardMarkup()
         markup.add(edit_fav_btn)
-
-        anek = c.execute('SELECT text FROM anek WHERE id=' + str(rand)).fetchall()
+        with lock:
+            anek = c.execute('SELECT text FROM anek WHERE id=' + str(rand)).fetchall()
 
         bot.send_message(message.chat.id, 'Вот тебе анекдот из моей базы данных.')
         bot.send_photo(message.chat.id, open('images/' + str(rand) + '.png', 'rb'),
@@ -127,9 +129,9 @@ def save_suggestion(message):
     if message.text != "Отмена":
 
         try:
-
-            c.execute("INSERT INTO suggestions VALUES (NULL, ?,?,?)", (user_id, username, suggestion))
-            conn.commit()
+            with lock:
+                c.execute("INSERT INTO suggestions VALUES (NULL, ?,?,?)", (user_id, username, suggestion))
+                conn.commit()
             bot.send_message(message.chat.id, 'Спасибо за Ваш анекдот, мы оценим его!',
                              reply_markup=types.ReplyKeyboardRemove())
 
@@ -265,15 +267,16 @@ def bot_stop(message):
 def favorite(message):
 
     try:
-
-        favs = c.execute('SELECT favs FROM user_fav WHERE id=' + str(message.from_user.id)).fetchall()[0][0]
+        with lock:
+            favs = c.execute('SELECT favs FROM user_fav WHERE id=' + str(message.from_user.id)).fetchall()[0][0]
         favs = str(favs).split()
 
         favdesc = []
         final_message = f'''<b>🌟 {message.from_user.full_name}, Ваши Избранные анекдоты:</b> \n \n'''
 
         for i in favs:
-            anek = c.execute('SELECT desc FROM anek WHERE id=' + str(i)).fetchall()
+            with lock:
+                anek = c.execute('SELECT desc FROM anek WHERE id=' + str(i)).fetchall()
             favdesc.append(anek)
 
         for i in range(len(favs)):
@@ -318,16 +321,16 @@ def remove_favorite_from_db(anek_id, user_id, message):
     anek_id, user_id = str(anek_id).strip(), str(user_id).strip()
 
     try:
-
-        favs = c.execute('SELECT favs FROM user_fav WHERE id = ?', (user_id, )).fetchall()[0][0]
+        with lock:
+            favs = c.execute('SELECT favs FROM user_fav WHERE id = ?', (user_id, )).fetchall()[0][0]
         favs = set(str(favs).split())
 
         if anek_id in favs:
             favs.remove(anek_id)
             favs = ' '.join(favs)
-
-            c.execute('UPDATE user_fav SET favs = ? WHERE id = ?', (favs, user_id))
-            conn.commit()
+            with lock:
+                c.execute('UPDATE user_fav SET favs = ? WHERE id = ?', (favs, user_id))
+                conn.commit()
 
             bot.send_message(message.chat.id, 'Успешно удалено',
                              reply_markup=keyboard)
@@ -348,24 +351,25 @@ def add_favorite_to_db(anek_id, user_id, message):
     anek_id, user_id = str(anek_id), str(user_id)
 
     try:
-
-        c.execute("SELECT id FROM user_fav WHERE id = ?", (user_id, ))
+        with lock:
+            c.execute("SELECT id FROM user_fav WHERE id = ?", (user_id, ))
 
         if c.fetchone() is None:
             bot.send_message(message.chat.id, 'Успешно добавлено', reply_markup=keyboard)
-
-            c.execute("INSERT INTO user_fav VALUES (?, ?)", (user_id, anek_id))
+            with lock:
+                c.execute("INSERT INTO user_fav VALUES (?, ?)", (user_id, anek_id))
             conn.commit()
 
         else:
-            favs = c.execute('SELECT favs FROM user_fav WHERE id = ?', (user_id, )).fetchall()[0][0]
+            with lock:
+                favs = c.execute('SELECT favs FROM user_fav WHERE id = ?', (user_id, )).fetchall()[0][0]
             favs = str(favs)
 
             if anek_id not in favs:
                 favs += ' ' + anek_id
-
-                c.execute('UPDATE user_fav SET favs = ? WHERE id = ?', (favs, user_id))
-                conn.commit()
+                with lock:
+                    c.execute('UPDATE user_fav SET favs = ? WHERE id = ?', (favs, user_id))
+                    conn.commit()
 
                 bot.send_message(message.chat.id, 'Успешно добавлено')
 
@@ -381,14 +385,12 @@ def add_favorite_to_db(anek_id, user_id, message):
 @bot.message_handler(content_types=['text'])
 def anek_by_id(message):
 
-    log(message)
-
     try:
 
         markup = types.InlineKeyboardMarkup()
-
-        fav_list = c.execute('SELECT favs FROM user_fav WHERE id = ?', (message.from_user.id, )).fetchall()
-        anek = c.execute('SELECT text FROM anek WHERE id =' + str(message.text)).fetchall()
+        with lock:
+            fav_list = c.execute('SELECT favs FROM user_fav WHERE id = ?', (message.from_user.id, )).fetchall()
+            anek = c.execute('SELECT text FROM anek WHERE id =' + str(message.text)).fetchall()
 
         if fav_list:
 
