@@ -263,6 +263,48 @@ def bot_stop(message):
             bot.send_message(message.chat.id, 'У вас недостаточно прав для выполнения этой команды :)')
 
 
+@bot.message_handler(commands=['logs'])
+def logs(message):
+
+    user_id = str(message.from_user.id)
+
+    try:
+
+        with open("admins.txt", "r") as adminl:
+            adminl = adminl.read()
+            adminl = adminl.split("\n")
+
+    finally:
+
+        if user_id in adminl:
+            file = open('logs/' + date + '.log', 'rb')
+            bot.send_document(message.chat.id, file)
+
+        else:
+            bot.send_message(message.chat.id, 'У вас недостаточно прав для выполнения этой команды :)')
+
+
+@bot.message_handler(commands=['db'])
+def database(message):
+
+    user_id = str(message.from_user.id)
+
+    try:
+
+        with open("admins.txt", "r") as adminl:
+            adminl = adminl.read()
+            adminl = adminl.split("\n")
+
+    finally:
+
+        if user_id in adminl:
+            file = open('anek.db', 'rb')
+            bot.send_document(message.chat.id, file)
+
+        else:
+            bot.send_message(message.chat.id, 'У вас недостаточно прав для выполнения этой команды :)')
+
+
 @bot.message_handler(commands=['fav'])
 def favorite(message):
 
