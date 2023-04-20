@@ -4,7 +4,6 @@ import telebot
 import random
 import logging
 import datetime
-import sys
 
 date_obj = datetime.datetime.now()
 date = date_obj.strftime('%m-%d-%y-%H-%M-%S ')
