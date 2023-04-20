@@ -75,17 +75,17 @@ def gen_rand_anek(message):
 
         if fav_list:
 
-            if rand in fav_list[0][0]:
-                callback_data = 'remove_fav ' + str(message.text) + ' ' + str(message.from_user.id)
+            if str(rand) in str(fav_list[0][0]):
+                callback_data = 'remove_fav ' + str(rand) + ' ' + str(message.from_user.id)
                 edit_fav_btn = types.InlineKeyboardButton(text='🚫 Удалить из избранного',
                                                           callback_data=callback_data)
             else:
-                callback_data = 'add_fav ' + str(message.text) + ' ' + str(message.from_user.id)
+                callback_data = 'add_fav ' + str(rand) + ' ' + str(message.from_user.id)
                 edit_fav_btn = types.InlineKeyboardButton(text='🌟 Добавить в избранное',
                                                           callback_data=callback_data)
 
         else:
-            callback_data = 'add_fav ' + str(message.text) + ' ' + str(message.from_user.id)
+            callback_data = 'add_fav ' + str(rand) + ' ' + str(message.from_user.id)
             edit_fav_btn = types.InlineKeyboardButton(text='🌟 Добавить в избранное',
                                                       callback_data=callback_data)
 
@@ -130,7 +130,8 @@ def save_suggestion(message):
 
             c.execute("INSERT INTO suggestions VALUES (NULL, ?,?,?)", (user_id, username, suggestion))
             conn.commit()
-            bot.send_message(message.chat.id, 'Спасибо за Ваш анекдот, мы оценим его!')
+            bot.send_message(message.chat.id, 'Спасибо за Ваш анекдот, мы оценим его!',
+                             reply_markup=types.ReplyKeyboardRemove())
 
         except Exception as e:
 
@@ -139,7 +140,8 @@ def save_suggestion(message):
 
     else:
 
-        bot.send_message(message.chat.id, 'Возвращайтесь, как передумаете ;)', reply_markup=types.ReplyKeyboardRemove())
+        bot.send_message(message.chat.id, 'Возвращайтесь, как передумаете ;)',
+                         reply_markup=types.ReplyKeyboardRemove())
 
 
 @bot.message_handler(commands=['sub'])
@@ -205,7 +207,7 @@ def unsubscribe(message):
 
 
 @bot.message_handler(commands=['send'])
-def sendm(message):
+def spam(message):
 
     try:
 
@@ -240,7 +242,7 @@ def sendm(message):
 
 
 @bot.message_handler(commands=['botstop'])
-def botstop(message):
+def bot_stop(message):
 
     user_id = str(message.from_user.id)
 
@@ -260,12 +262,12 @@ def botstop(message):
 
 
 @bot.message_handler(commands=['fav'])
-def fav(message):
+def favorite(message):
 
     try:
 
         favs = c.execute('SELECT favs FROM user_fav WHERE id=' + str(message.from_user.id)).fetchall()[0][0]
-        favs = favs.split()
+        favs = str(favs).split()
 
         favdesc = []
         final_message = f'''<b>🌟 {message.from_user.full_name}, Ваши Избранные анекдоты:</b> \n \n'''
@@ -287,30 +289,30 @@ def fav(message):
 
     except Exception as e:
 
-        bot.send_message(message.chat.id, 'Что-то пошло не так.')
+        bot.send_message(message.chat.id, 'Что-то пошло не так')
 
         logging.error("Ошибка > " + str(e))
 
 
 @bot.callback_query_handler(func=lambda call: True)
-def edit_fav(call):
+def edit_favorite(call):
 
     if 'add_fav' in call.data:
         anek_id = call.data.split()[1]
         user_id = call.data.split()[2]
 
-        logging.info(anek_id, 'add')
-        add_fav_to_db(anek_id, user_id, call.message)
+        logging.info(str(anek_id) + 'add')
+        add_favorite_to_db(anek_id, user_id, call.message)
 
     elif 'remove_fav' in call.data:
         anek_id = call.data.split()[1]
         user_id = call.data.split()[2]
 
-        logging.info(anek_id, 'remove')
-        remove_fav_from_db(anek_id, user_id, call.message)
+        logging.info(str(anek_id) + 'remove')
+        remove_favorite_from_db(anek_id, user_id, call.message)
 
 
-def remove_fav_from_db(anek_id, user_id, message):
+def remove_favorite_from_db(anek_id, user_id, message):
 
     keyboard = types.InlineKeyboardMarkup()
     anek_id, user_id = str(anek_id).strip(), str(user_id).strip()
@@ -340,7 +342,7 @@ def remove_fav_from_db(anek_id, user_id, message):
         logging.error("error > " + str(e))
 
 
-def add_fav_to_db(anek_id, user_id, message):
+def add_favorite_to_db(anek_id, user_id, message):
 
     keyboard = types.InlineKeyboardMarkup()
     anek_id, user_id = str(anek_id), str(user_id)
@@ -371,7 +373,6 @@ def add_fav_to_db(anek_id, user_id, message):
                 bot.send_message(message.chat.id, 'Этот анекдот уже есть в избранном')
 
     except Exception as e:
-
         bot.send_message(message.chat.id, 'Попробуйте позже, ошибка!')
 
         logging.error("error > " + str(e))
@@ -391,7 +392,13 @@ def anek_by_id(message):
 
         if fav_list:
 
-            if message.text in fav_list[0][0]:
+            print(fav_list[0][0])
+            print(type(fav_list[0][0]))
+            if message.text in str(fav_list[0][0]):
+                callback_data = 'remove_fav ' + str(message.text) + ' ' + str(message.from_user.id)
+                edit_fav_btn = types.InlineKeyboardButton(text='🚫 Удалить из избранного',
+                                                          callback_data=callback_data)
+            elif message.text in fav_list[0][0]:
                 callback_data = 'remove_fav ' + str(message.text) + ' ' + str(message.from_user.id)
                 edit_fav_btn = types.InlineKeyboardButton(text='🚫 Удалить из избранного',
                                                           callback_data=callback_data)
@@ -412,7 +419,6 @@ def anek_by_id(message):
                        reply_markup=markup)
 
     except Exception as e:
-
         bot.send_message(message.chat.id, 'Неверная команда или ID анекдота.')
 
         logging.error("error > " + str(e))
@@ -421,5 +427,4 @@ def anek_by_id(message):
 bot.infinity_polling()
 
 if __name__ == '__main__':
-
     logging.info("Bot STOPPED")
