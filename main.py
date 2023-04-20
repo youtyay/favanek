@@ -76,20 +76,12 @@ def gen_rand_anek(message):
         anek = c.execute('SELECT text FROM anek WHERE id=' + str(rand)).fetchall()
         bot.send_message(message.chat.id, 'Вот тебе анекдот из моей базы данных.')
         bot.send_photo(message.chat.id, open('images/' + str(rand) + '.png', 'rb'),
-                       caption=("<b>#" + str(rand) + "\n \n</b>" + "<i>" + anek[0][0] + "</i>"), parse_mode='HTML',
+                       caption=("<b>#" + str(rand) + "\n \n</b>" + "<i>" + anek[0][0] + "</i>"),
+                       parse_mode='HTML',
                        reply_markup=markup)
     except Exception as e:
-        logging.error("Ошибка > " + str(e))
+        logging.error("error > " + str(e))
         bot.send_message(message.chat.id, 'Произошла ошибка.')
-
-
-@bot.callback_query_handler(func=lambda call: True)
-def add_fav(call):
-    if 'add_fav' in call.data:
-        anek_id = call.data.split()[-1]
-        user_id = call.message.from_user.id
-        print(anek_id)
-        add_fav_to_db(anek_id, user_id, call.message)
 
 
 @bot.message_handler(commands=['suggest'])
@@ -112,7 +104,7 @@ def save_suggestion(message):
             conn.commit()
             bot.send_message(message.chat.id, 'Спасибо за Ваш анекдот, мы оценим его!')
         except Exception as e:
-            logging.error("Ошибка > " + str(e))
+            logging.error("error > " + str(e))
             bot.send_message(message.chat.id, 'Попробуйте позже, ошибка!')
     else:
         bot.send_message(message.chat.id, 'Возвращайтесь, как передумаете ;)', reply_markup=types.ReplyKeyboardRemove())
@@ -133,7 +125,7 @@ def subscribe(message):
             bot.send_message(message.chat.id, 'Вы подписались на рассылку анекдотов :)')
     except Exception as e:
         bot.send_message(message.chat.id, 'Произошла ошибка.')
-        logging.error("Ошибка > " + str(e))
+        logging.error("error > " + str(e))
 
 
 @bot.message_handler(commands=['unsub'])
@@ -158,7 +150,7 @@ def unsubscribe(message):
             bot.send_message(message.chat.id, 'Вы отписались от рассылки анекдотов :(')
     except Exception as e:
         bot.send_message(message.chat.id, 'Произошла ошибка.')
-        logging.error("Ошибка > " + str(e))
+        logging.error("error > " + str(e))
 
 
 @bot.message_handler(commands=['send'])
@@ -182,7 +174,7 @@ def sendm(message):
             bot.send_message(message.chat.id, 'У вас недостаточно прав для выполнения этой команды :)')
     except Exception as e:
         bot.send_message(message.chat.id, 'Что-то пошло не так.')
-        logging.error("Ошибка > " + str(e))
+        logging.error("error > " + str(e))
 
 
 @bot.message_handler(commands=['botstop'])
@@ -199,42 +191,49 @@ def botstop(message):
             bot.send_message(message.chat.id, 'У вас недостаточно прав для выполнения этой команды :)')
 
 
-@bot.message_handler(content_types=['text'])
-def anek_by_id(message):
-    log(message)
-    try:
-        markup = types.InlineKeyboardMarkup()
-        add_fav_btn = types.InlineKeyboardButton(text='🌟 Добавить в избранное',
-                                                 callback_data='add_fav ' + str(message.text))
-        markup.add(add_fav_btn)
-        anek = c.execute('SELECT text FROM anek WHERE id=' + str(message.text)).fetchall()
-        bot.send_photo(message.chat.id, open('images/' + message.text + '.png', 'rb'),
-                       caption=("<b>#" + message.text + "\n \n</b>" + "<i>" + anek[0][0] + "</i>"), parse_mode='HTML',
-                       reply_markup=markup)
-    except Exception as e:
-        bot.send_message(message.chat.id, 'Неверная команда или ID анекдота.')
-        logging.error("Ошибка > " + str(e))
-
-
 @bot.callback_query_handler(func=lambda call: True)
-def add_fav(call):
+def edit_fav(call):
     if 'add_fav' in call.data:
         anek_id = call.data.split()[-1]
         user_id = call.message.from_user.id
-        print(anek_id)
+        print(anek_id, 'add')
         add_fav_to_db(anek_id, user_id, call.message)
+    elif 'remove_fav' in call.data:
+        anek_id = call.data.split()[-1]
+        user_id = call.message.from_user.id
+        print(anek_id, 'remove')
+        remove_fav_from_db(anek_id, user_id, call.message)
+
+
+def remove_fav_from_db(anek_id, user_id, message):
+
+    keyboard = types.InlineKeyboardMarkup()
+    anek_id, user_id = str(anek_id).strip(), str(user_id).strip()
+
+    try:
+        favs = c.execute('SELECT favs FROM user_fav WHERE id = ?', (user_id, )).fetchall()[0][0]
+        favs = set(str(favs).split())
+        if anek_id in favs:
+            favs.remove(anek_id)
+            favs = ' '.join(favs)
+            c.execute('UPDATE user_fav SET favs = ? WHERE id = ?', (favs, user_id))
+            conn.commit()
+            bot.send_message(message.chat.id, 'Успешно удалено', reply_markup=keyboard)
+        else:
+            bot.send_message(message.chat.id, 'Этого анекдота нет в избранном или произошла ошибка')
+    except Exception as e:
+        logging.error("error > " + str(e))
+        bot.send_message(message.chat.id, 'Попробуйте позже, ошибка!')
 
 
 def add_fav_to_db(anek_id, user_id, message):
-    global c, conn
-
     keyboard = types.InlineKeyboardMarkup()
     anek_id, user_id = str(anek_id), str(user_id)
 
     try:
         c.execute("SELECT id FROM user_fav WHERE id = ?", (user_id, ))
         if c.fetchone() is None:
-            bot.send_message(message.chat.id, 'Успешно добавлено')
+            bot.send_message(message.chat.id, 'Успешно добавлено', reply_markup=keyboard)
             c.execute("INSERT INTO user_fav VALUES (?, ?)", (user_id, anek_id))
             conn.commit()
         else:
@@ -244,12 +243,42 @@ def add_fav_to_db(anek_id, user_id, message):
                 favs += ' ' + anek_id
                 c.execute('UPDATE user_fav SET favs = ? WHERE id = ?', (favs, user_id))
                 conn.commit()
-                bot.send_message(message.chat.id, 'Успешно добавлено', reply_markup=keyboard)
+                bot.send_message(message.chat.id, 'Успешно добавлено')
             else:
                 bot.send_message(message.chat.id, 'Этот анекдот уже есть в избранном')
     except Exception as e:
-        logging.error("Ошибка > " + str(e))
+        logging.error("error > " + str(e))
         bot.send_message(message.chat.id, 'Попробуйте позже, ошибка!')
+
+
+@bot.message_handler(content_types=['text'])
+def anek_by_id(message):
+    log(message)
+    try:
+        markup = types.InlineKeyboardMarkup()
+        fav_list = c.execute('SELECT favs FROM user_fav WHERE id = ?', (message.from_user.id, )).fetchall()
+        anek = c.execute('SELECT text FROM anek WHERE id =' + str(message.text)).fetchall()
+        print(fav_list)
+        print(message.from_user.id)
+        if fav_list:
+            if message.text in fav_list[0]:
+                edit_fav_btn = types.InlineKeyboardButton(text='🚫 Удалить из избранного',
+                                                          callback_data='remove_fav ' + str(message.text))
+            else:
+                edit_fav_btn = types.InlineKeyboardButton(text='🌟 Добавить в избранное',
+                                                          callback_data='add_fav ' + str(message.text))
+        else:
+            edit_fav_btn = types.InlineKeyboardButton(text='🌟 Добавить в избранное',
+                                                      callback_data='add_fav ' + str(message.text))
+        markup.add(edit_fav_btn)
+        bot.send_photo(message.chat.id, open('images/' + message.text + '.png', 'rb'),
+                       caption=("<b>#" + message.text + "\n \n</b>" + "<i>" + anek[0][0] + "</i>"),
+                       parse_mode='HTML',
+                       reply_markup=markup)
+    except Exception as e:
+        print(str(e))
+        bot.send_message(message.chat.id, 'Неверная команда или ID анекдота.')
+        logging.error("error > " + str(e))
 
 
 bot.infinity_polling()
