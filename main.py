@@ -15,7 +15,7 @@ logging.basicConfig(
     format='%(asctime)s %(levelname)s %(name)s %(message)s'
 )
 
-token = "6234331500:AAG2Hcuep4y4N58uuJeXrHnjbpaSyrpXk3c"
+token = "6234331500:AAFypgazVEgXq7ltiBInG7ZJ6xY8n8i1lrA"
 logging.info('Token successfully initted: ' + token)
 bot = telebot.TeleBot(token)
 logging.info("Bot successfully initted")
@@ -392,13 +392,11 @@ def anek_by_id(message):
 
         if fav_list:
 
-            print(fav_list[0][0])
-            print(type(fav_list[0][0]))
             if message.text in str(fav_list[0][0]):
                 callback_data = 'remove_fav ' + str(message.text) + ' ' + str(message.from_user.id)
                 edit_fav_btn = types.InlineKeyboardButton(text='🚫 Удалить из избранного',
                                                           callback_data=callback_data)
-            elif message.text in fav_list[0][0]:
+            elif message.text in str(fav_list[0][0]):
                 callback_data = 'remove_fav ' + str(message.text) + ' ' + str(message.from_user.id)
                 edit_fav_btn = types.InlineKeyboardButton(text='🚫 Удалить из избранного',
                                                           callback_data=callback_data)
