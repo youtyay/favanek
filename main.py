@@ -12,12 +12,12 @@ date = date_obj.strftime('%m-%d-%y-%H-%M-%S ')
 
 # logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s %(message)s')
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     filename=('logs/' + date + '.log'),
     format='%(asctime)s %(levelname)s %(name)s %(message)s'
 )
 
-token = "6234331500:AAFypgazVEgXq7ltiBInG7ZJ6xY8n8i1lrA"
+token = ""
 logging.info('Token successfully initted: ' + token)
 bot = telebot.TeleBot(token)
 logging.info("Bot successfully initted")
@@ -34,7 +34,7 @@ def log(message): logging.info(str(message.chat.id) + " " + "@" + str(message.fr
 @bot.message_handler(commands=['start'])
 def start(message):
     log(message)
-    bot.send_message(message.chat.id, f'''👋 <b>Привет, {message.from_user.full_name}! Я - Фаванек, твой проводник в мир 
+    bot.send_message(message.chat.id, f'''👋 <b>Привет, {message.from_user.full_name}! Я - Фаванек, твой проводник в мир
 самых смешных анекдотов!</b>
 
 😂 <i><b>У меня в коллекции большое количество шуток, как авторских, так и самых популярных из Интернета :)</b></i>
@@ -45,7 +45,7 @@ def start(message):
 - Предлагать свои анекдоты администрации
 - Получать рассылку с новыми анекдотами</b>
 
-❗<b>ВНИМАНИЕ! Некоторые анекдоты могут содержать нецензурную лексику, чёрный юмор, неприемлемые темы. 
+❗<b>ВНИМАНИЕ! Некоторые анекдоты могут содержать нецензурную лексику, чёрный юмор, неприемлемые темы.
 Мы не несём ответственность, если анекдот как-то задел вас и/или группу людей.</b>
 
 🛠 <u><b>Технические вопросы к @anal_nosorog2009 и @Youtya_Youtyev</b></u>
@@ -61,7 +61,7 @@ def start(message):
 /start - это сообщение
 /rand - случайный анекдот
 /fav - список избранных анекдотов
-/sub - подписаться на рассылку 
+/sub - подписаться на рассылку
 /unsub - отписаться от рассылки
 /suggest - предложить ваш анекдот :)</i>''', parse_mode='HTML')
 
@@ -109,6 +109,7 @@ def gen_rand_anek(message):
 
 @bot.message_handler(commands=['suggest'])
 def suggest_message(message):
+    log(message)
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     btn1 = types.KeyboardButton("Отмена")
@@ -148,7 +149,7 @@ def save_suggestion(message):
 
 @bot.message_handler(commands=['sub'])
 def subscribe(message):
-
+    log(message)
     try:
 
         user_id = str(message.from_user.id)
@@ -175,7 +176,7 @@ def subscribe(message):
 
 @bot.message_handler(commands=['unsub'])
 def unsubscribe(message):
-
+    log(message)
     try:
 
         user_id = str(message.from_user.id)
@@ -210,7 +211,7 @@ def unsubscribe(message):
 
 @bot.message_handler(commands=['send'])
 def spam(message):
-
+    log(message)
     try:
 
         user_id = str(message.from_user.id)
@@ -245,7 +246,7 @@ def spam(message):
 
 @bot.message_handler(commands=['botstop'])
 def bot_stop(message):
-
+    log(message)
     user_id = str(message.from_user.id)
 
     try:
@@ -265,7 +266,7 @@ def bot_stop(message):
 
 @bot.message_handler(commands=['logs'])
 def logs(message):
-
+    log(message)
     user_id = str(message.from_user.id)
 
     try:
@@ -286,7 +287,7 @@ def logs(message):
 
 @bot.message_handler(commands=['db'])
 def database(message):
-
+    log(message)
     user_id = str(message.from_user.id)
 
     try:
@@ -305,9 +306,30 @@ def database(message):
             bot.send_message(message.chat.id, 'У вас недостаточно прав для выполнения этой команды :)')
 
 
+@bot.message_handler(commands=['file'])
+def download(message):
+    log(message)
+    user_id = str(message.from_user.id)
+
+    try:
+
+        with open("admins.txt", "r") as adminl:
+            adminl = adminl.read()
+            adminl = adminl.split("\n")
+
+    finally:
+
+        if user_id in adminl:
+            file = open(message.text[6:], 'rb')
+            bot.send_document(message.chat.id, file)
+
+        else:
+            bot.send_message(message.chat.id, 'У вас недостаточно прав для выполнения этой команды :)')
+
+
 @bot.message_handler(commands=['fav'])
 def favorite(message):
-
+    log(message)
     try:
         with lock:
             favs = c.execute('SELECT favs FROM user_fav WHERE id=' + str(message.from_user.id)).fetchall()[0][0]
@@ -322,7 +344,7 @@ def favorite(message):
             favdesc.append(anek)
 
         for i in range(len(favs)):
-            a = favs[i][0][0]
+            a = favs[i]
             b = favdesc[i][0][0]
             final_message = final_message + "<b>#" + str(a) + "</b> - <i>«" + str(b) + "»</i> \n \n"
 
@@ -426,7 +448,7 @@ def add_favorite_to_db(anek_id, user_id, message):
 
 @bot.message_handler(content_types=['text'])
 def anek_by_id(message):
-
+    log(message)
     try:
 
         markup = types.InlineKeyboardMarkup()
