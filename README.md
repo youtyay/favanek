@@ -8,4 +8,4 @@
 
 <i>Made as the educational project in total ~12 hours of working time.</i>
 
-<b>Try it yourself here</b> 👉 [*click!*](t.me/favanek_bot)
+<b>Try it yourself here</b> 👉 [*click!*](https://t.me/favanek_bot)
