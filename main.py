@@ -71,7 +71,7 @@ def gen_rand_anek(message):
     log(message)
     try:
 
-        rand = random.randrange(1, 10)
+        rand = random.randrange(1, 22)
         with lock:
             fav_list = c.execute('SELECT favs FROM user_fav WHERE id = ?', (message.from_user.id,)).fetchall()
 
@@ -334,6 +334,18 @@ def favorite(message):
         with lock:
             favs = c.execute('SELECT favs FROM user_fav WHERE id=' + str(message.from_user.id)).fetchall()[0][0]
         favs = str(favs).split()
+
+        def inter(string):
+            return int(string)
+
+        def stringer(integer):
+            return str(integer)
+
+        favs = map(inter, favs)
+        favs = list(favs)
+        favs.sort()
+        favs = map(stringer, favs)
+        favs = list(favs)
 
         favdesc = []
         final_message = f'''<b>🌟 {message.from_user.full_name}, Ваши Избранные анекдоты:</b> \n \n'''
